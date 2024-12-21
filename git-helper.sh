@@ -233,42 +233,40 @@ undo_last_commit() {
 #  - git stash pop if there were local changes
 sync() {
   # Controleer of er lokale wijzigingen zijn
-  if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo "Local changes detected."
-    echo "Local changes stashed."
-    git stash push --include-untracked  # Sla lokale wijzigingen op
-  fi
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "Local changes detected."
+  echo "Local changes stashed."
+  git stash push --include-untracked  # Sla lokale wijzigingen op
+fi
 
-  # Controleer of er een remote repository is ingesteld
-  if ! git remote -v &>/dev/null; then
-    echo "No remote repository configured. Please add a remote repository."
-    return 1  # Stop de uitvoering als er geen remote is ingesteld
-  fi
+# Controleer of er een remote repository is ingesteld
+if ! git remote -v &>/dev/null; then
+  echo "No remote repository configured. Please add a remote repository."
+  return 1  # Stop de uitvoering als er geen remote is ingesteld
+fi
 
+# Voer een rebase uit om remote wijzigingen op te halen
+if git pull --rebase; then
+  echo "Remote changes pulled successfully."
+else
+  echo "There were conflicts during the pull. Please resolve them."
+  git status
+  return 1  # Stop de uitvoering als er conflicten zijn
+fi
 
+# Push de wijzigingen naar de remote repository
+git push
+echo "Changes pushed to the remote repository."
 
-  # Push de wijzigingen naar de remote repository
-  if git push; then
-    echo "Changes pushed to the remote repository."
-  else
-    echo "Failed to push changes to the remote repository." >&2
-    return 1  # Stop de uitvoering als de push faalt
-  fi
+# Push alle labels (tags) naar de remote
+git push --tags
+echo "Tags pushed to the remote repository."
 
-  # Push alle labels (tags) naar de remote
-  if git push --tags; then
-    echo "Tags pushed to the remote repository."
-  else
-    echo "Failed to push tags to the remote repository." >&2
-    return 1  # Stop de uitvoering als de push van tags faalt
-  fi
-
-
-  # Als er lokale wijzigingen waren, herstel ze dan
-  if git stash list | grep -q "stash@{0}"; then
-    git stash pop
-    echo "Local changes unstashed."
-  fi
+# Als er lokale wijzigingen waren, herstel ze dan
+if git stash list | grep -q "stash@{0}"; then
+  git stash pop
+  echo "Local changes unstashed."
+fi
 }
 
 # Usage: usage
