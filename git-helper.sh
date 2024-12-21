@@ -249,6 +249,7 @@ sync() {
   if git pull --rebase; then
     echo "Remote changes pulled successfully."
   else
+    # Als er een conflict is, stoppen we hier en tonen we een statusbericht
     echo "There were conflicts during the pull. Please resolve them."
     git status
     return 1  # Stop de uitvoering als er conflicten zijn
