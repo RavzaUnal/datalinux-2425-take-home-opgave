@@ -245,15 +245,7 @@ sync() {
     return 1  # Stop de uitvoering als er geen remote is ingesteld
   fi
 
-  # Voer een rebase uit om remote wijzigingen op te halen
-  if git pull --rebase; then
-    echo "Remote changes pulled successfully."
-  else
-    # Als er een conflict is, stoppen we hier en tonen we een statusbericht
-    echo "There were conflicts during the pull. Please resolve them."
-    git status
-    return 1  # Stop de uitvoering als er conflicten zijn
-  fi
+
 
   # Push de wijzigingen naar de remote repository
   if git push; then
@@ -270,6 +262,7 @@ sync() {
     echo "Failed to push tags to the remote repository." >&2
     return 1  # Stop de uitvoering als de push van tags faalt
   fi
+
 
   # Als er lokale wijzigingen waren, herstel ze dan
   if git stash list | grep -q "stash@{0}"; then
