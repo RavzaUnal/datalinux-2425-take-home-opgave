@@ -290,8 +290,4 @@ EOF
   exit 0
 }
 
-<<<<<<< Updated upstream
 main "${@}"
-=======
-main "${@}"
->>>>>>> Stashed changes
